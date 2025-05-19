@@ -48,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -58,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Stack(
                 children: [
-                  Image.asset('assets/images/backgroundImage.png'),
+                  SizedBox(width: double.infinity, height:  size.height * 0.4, child: Image.asset('assets/images/backgroundImage.png',fit: BoxFit.cover,)),
                   Positioned(
                     top: 160,
                     left: 0,

@@ -27,7 +27,7 @@ class _SignupScreenState extends State<SignupScreen> {
             Stack(
               children: [
                 SizedBox(
-                  height: screenHeight * 0.22,
+                  height: screenHeight * 0.25,
                   width: double.infinity,
                   child: Image.asset(
                     "assets/images/backgroundImage.png",

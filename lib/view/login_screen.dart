@@ -81,12 +81,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       'Welcome back!',
-                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 20,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
                       'Email Address',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
@@ -95,9 +101,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email address';
-                        } 
+                        }
 
-                        final emailRegex = RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+                        final emailRegex = RegExp(
+                          r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                        );
 
                         if (!emailRegex.hasMatch(value)) {
                           return 'Please enter a valid email';
@@ -115,7 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20),
                     Text(
                       'Password',
-                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     const SizedBox(height: 10),
                     TextFormField(
@@ -125,7 +136,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your password';
                         }
-
                         return null;
                       },
                       decoration: InputDecoration(

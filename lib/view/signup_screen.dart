@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:tradeverse/view/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -118,7 +120,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
-        
+
                   const SizedBox(height: 26),
                   Row(
                     children: [
@@ -129,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           endIndent: 12,
                         ),
                       ),
-        
+
                       const Text(
                         'or continue with',
                         style: TextStyle(
@@ -137,7 +139,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-        
+
                       const Expanded(
                         child: Divider(
                           indent: 12,
@@ -147,9 +149,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ],
                   ),
-        
+
                   const SizedBox(height: 24),
-        
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -176,27 +178,36 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                   ),
-        
+
                   const SizedBox(height: 40),
-        
-                    Center(
-                      child: RichText(
-                        text: TextSpan(
-                          text: 'Already have an account?',
-                          style: TextStyle(fontSize: 16, color: Colors.black87),
-                          children: [
-                            TextSpan(
-                              text: ' Signin',
-                              style: TextStyle(
-                                color: brandColor,
-                                fontWeight: FontWeight.w600,
-                              ),
+
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'Already have an account?',
+                        style: TextStyle(fontSize: 16, color: Colors.black87),
+                        children: [
+                          TextSpan(
+                            text: ' Signin',
+                            style: TextStyle(
+                              color: brandColor,
+                              fontWeight: FontWeight.w600,
                             ),
-                          ],
-                        ),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                    );
+                                  },
+                          ),
+                        ],
                       ),
                     ),
-        
+                  ),
                 ],
               ),
             ),

@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:tradeverse/view/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,6 +11,34 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final brandColor = Color(0xFFFF575A);
+
+  // Default credentials
+  final String defaultEmail = 'test@example.com';
+  final String defaultPassword = '123456';
+
+  // Controllers
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  void handleLogin() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (email == defaultEmail && password == defaultPassword) {
+      Navigator.pushReplacementNamed(context, '/dashboard');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid email or password')),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +66,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ],
             ),
-
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
@@ -46,18 +75,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     'Welcome back!',
                     style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
                   ),
-
                   const SizedBox(height: 20),
-
                   Text(
                     'Email Address',
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
                   ),
-
                   const SizedBox(height: 10),
-
                   TextField(
-                    keyboardType: TextInputType.number,
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: 'Enter your email address',
                       border: OutlineInputBorder(
@@ -65,19 +91,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
                   Text(
                     'Password',
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
                   ),
-
                   const SizedBox(height: 10),
-
                   TextField(
+                    controller: passwordController,
                     obscureText: true,
-                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: 'Enter your password',
                       border: OutlineInputBorder(
@@ -85,26 +107,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 14),
-
                   Align(
                     alignment: Alignment.centerRight,
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        // Add forgot password logic
+                      },
                       child: Text(
                         'Forgot Password?',
                         style: TextStyle(fontSize: 16, color: brandColor),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 26),
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: brandColor,
                         foregroundColor: Colors.white,
@@ -119,9 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 26),
-
                   Row(
                     children: [
                       const Expanded(
@@ -131,7 +149,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           endIndent: 12,
                         ),
                       ),
-
                       const Text(
                         'or continue with',
                         style: TextStyle(
@@ -139,7 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-
                       const Expanded(
                         child: Divider(
                           indent: 12,
@@ -149,13 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 24),
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                        // Add Google sign-in logic
+                      },
                       label: Text(
                         'Signin with google',
                         style: TextStyle(
@@ -178,9 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 40),
-
                   Center(
                     child: RichText(
                       text: TextSpan(
@@ -193,6 +207,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: brandColor,
                               fontWeight: FontWeight.w600,
                             ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SignupScreen(),
+                                  ),
+                                );
+                              },
                           ),
                         ],
                       ),

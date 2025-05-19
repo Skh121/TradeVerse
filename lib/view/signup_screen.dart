@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final brandColor = Color(0xFFFF575A);
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -20,108 +21,105 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Stack(
               children: [
-                Image.asset('assets/images/backgroundImage.png'),
+                SizedBox(
+                  height: screenHeight * 0.22,
+                  width: double.infinity,
+                  child: Image.asset(
+                    "assets/images/backgroundImage.png",
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 Positioned(
-                  top: 160,
+                  top: 100,
                   left: 0,
                   right: 0,
                   child: Center(
                     child: Image.asset(
-                      'assets/images/appLogo.png',
-                      width: 92,
-                      height: 92,
-                      fit: BoxFit.contain,
+                      "assets/images/appLogo.png",
+                      width: 85,
+                      height: 85,
                     ),
                   ),
                 ),
               ],
             ),
-
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back!',
-                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20),
+                    "Welcome!",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
                   ),
-
-                  const SizedBox(height: 20),
-
+                  SizedBox(height: 20),
                   Text(
-                    'Email Address',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
+                    "Email Address",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                   ),
-
-                  const SizedBox(height: 10),
-
+                  SizedBox(height: 16),
                   TextField(
-                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      hintText: 'Enter your email address',
+                      hintText: "Enter your Email Address",
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 20),
-
+                  SizedBox(height: 16),
                   Text(
-                    'Password',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400),
+                    "Create a new password",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
                   ),
-
-                  const SizedBox(height: 10),
-
+                  SizedBox(height: 16),
                   TextField(
                     obscureText: true,
-                    keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      hintText: 'Enter your password',
+                      hintText: "Enter a New Password",
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 14),
-
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(fontSize: 16, color: brandColor),
+                  SizedBox(height: 16),
+                  Text(
+                    "Re-type the password",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                  ),
+                  SizedBox(height: 16),
+                  TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      hintText: "Enter the password",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 26),
-
+                  SizedBox(height: 26),
                   SizedBox(
                     width: double.infinity,
+                    height: 50,
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: brandColor,
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       child: Text(
-                        'Login Now',
+                        "Sign Up Now",
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
                           fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-
+        
                   const SizedBox(height: 26),
-
                   Row(
                     children: [
                       const Expanded(
@@ -131,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           endIndent: 12,
                         ),
                       ),
-
+        
                       const Text(
                         'or continue with',
                         style: TextStyle(
@@ -139,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-
+        
                       const Expanded(
                         child: Divider(
                           indent: 12,
@@ -149,9 +147,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ],
                   ),
-
+        
                   const SizedBox(height: 24),
-
+        
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -178,26 +176,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-
+        
                   const SizedBox(height: 40),
-
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: 'Don\'t have an account?',
-                        style: TextStyle(fontSize: 16, color: Colors.black87),
-                        children: [
-                          TextSpan(
-                            text: ' Signup',
-                            style: TextStyle(
-                              color: brandColor,
-                              fontWeight: FontWeight.w600,
+        
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Already have an account?',
+                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                          children: [
+                            TextSpan(
+                              text: ' Signin',
+                              style: TextStyle(
+                                color: brandColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+        
                 ],
               ),
             ),

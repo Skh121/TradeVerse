@@ -48,7 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
@@ -61,7 +60,14 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Stack(
                 children: [
-                  SizedBox(width: double.infinity, height:  size.height * 0.4, child: Image.asset('assets/images/backgroundImage.png',fit: BoxFit.cover,)),
+                  SizedBox(
+                    width: double.infinity,
+                    height: size.height * 0.35,
+                    child: Image.asset(
+                      'assets/images/backgroundImage.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                   Positioned(
                     top: 160,
                     left: 0,
@@ -170,18 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             handleLogin();
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: brandColor,
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 13),
-                        ),
-                        child: Text(
-                          'Login Now',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
+                        child: Text('Login Now'),
                       ),
                     ),
                     const SizedBox(height: 26),
@@ -217,13 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           // Add Google sign-in logic
                         },
-                        label: Text(
-                          'Signin with google',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        label: Text('Signin with google'),
                         icon: Image.asset('assets/images/googleLogo.png'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -239,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 30),
                     Center(
                       child: RichText(
                         text: TextSpan(
@@ -267,6 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 15),
                   ],
                 ),
               ),

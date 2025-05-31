@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tradeverse/theme/theme_data.dart';
 import 'package:tradeverse/view/dashboard.dart';
 import 'package:tradeverse/view/login_screen.dart';
 import 'package:tradeverse/view/signup_screen.dart';
@@ -11,10 +12,8 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Auth Screens',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      title: 'Trade Verse',
+      theme: getApplicationTheme(),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),

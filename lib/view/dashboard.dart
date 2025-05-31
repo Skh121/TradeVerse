@@ -26,6 +26,16 @@ class Dashboard extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        selectedItemColor: Colors.red,
+        type: BottomNavigationBarType.fixed,
+        items: <BottomNavigationBarItem>[
+        BottomNavigationBarItem(icon:ImageIcon(AssetImage('assets/images/dashboardIcon.png')),label:"Dashboard"),
+        BottomNavigationBarItem(icon: ImageIcon(AssetImage('assets/images/performanceIcon.png')),label:"Performance",),
+        BottomNavigationBarItem(icon: Icon(Icons.calendar_month),label:"Journal"),
+        BottomNavigationBarItem(icon: Icon(Icons.person),label:"Profile")
+      ]),
     );
   }
 }

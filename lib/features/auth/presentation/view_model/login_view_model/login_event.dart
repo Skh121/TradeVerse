@@ -42,3 +42,10 @@ class NavigateToSignupEvent extends LoginEvent {
   final BuildContext context;
   const NavigateToSignupEvent({required this.context});
 }
+
+class NavigateToDashboardView extends LoginEvent {
+  final BuildContext context;
+  final Widget destination;
+
+  const NavigateToDashboardView({required this.context, required this.destination});
+}

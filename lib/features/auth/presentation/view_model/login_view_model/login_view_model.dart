@@ -56,13 +56,13 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
           ),
         ),
       },
-      (right) => {
+      (right) {
         emit(
           state.copyWith(
             formStatus: FormStatus.success,
             message: "Login Successfull",
           ),
-        ),
+        );
       },
     );
   }
@@ -88,4 +88,5 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
   void _onResetFormStatus(ResetFormStatus event, Emitter<LoginState> emit) {
     emit(state.copyWith(formStatus: FormStatus.initial, message: null));
   }
+
 }

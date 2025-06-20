@@ -174,10 +174,13 @@ class LoginView extends StatelessWidget {
                           builder: (context, state) {
                             return ElevatedButton(
                               onPressed: () {
+                                
                                 if (_formKey.currentState!.validate()) {
+                                  
                                   bloc.add(
                                     LoginSubmitted(state.email, state.password),
                                   );
+                                  Navigator.pushReplacementNamed(context, "/dashboard");
                                 }
                               },
                               child: Text('Login Now'),

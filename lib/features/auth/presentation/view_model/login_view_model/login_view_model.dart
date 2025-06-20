@@ -15,6 +15,7 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<ResetFormStatus>(_onResetFormStatus);
     on<NavigateToSignupEvent>(_onNavigateToSignup);
+    // on<NavigateToDashboardView>(_onNavigateToDashboardView);
   }
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
@@ -56,13 +57,13 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
           ),
         ),
       },
-      (right) => {
+      (right) {
         emit(
           state.copyWith(
             formStatus: FormStatus.success,
             message: "Login Successfull",
           ),
-        ),
+        );
       },
     );
   }
@@ -88,4 +89,23 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
   void _onResetFormStatus(ResetFormStatus event, Emitter<LoginState> emit) {
     emit(state.copyWith(formStatus: FormStatus.initial, message: null));
   }
+
+   void _onNavigateToDashboardView(
+    NavigateToSignupEvent event,
+    Emitter<LoginState> emit,
+  ) {
+    if (event.context.mounted) {
+      Navigator.push(
+        event.context,
+        MaterialPageRoute(
+          builder:
+              (context) => BlocProvider.value(
+                value: serviceLocator<SignupViewModel>(),
+                child: SignupView(),
+              ),
+        ),
+      );
+    }
+  }
+
 }

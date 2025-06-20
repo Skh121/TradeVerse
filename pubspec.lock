@@ -61,7 +61,7 @@ packages:
       sha256: "52c10575f4445c61dd9e0cafcc6356fdd827c4c64dd7945ef3c4105f6b6ac189"
       url: "https://pub.dev"
     source: hosted
-    version: "2.12.0"
+    version: "9.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -1046,10 +1046,18 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: "0968250880a6c5fe7edc067ed0a13d4bae1577fe2771dcf3010d52c4a9d3ca14"
+      sha256: ddfa8d30d89985b96407efce8acbdd124701f96741f2d981ca860662f1c0dc02
       url: "https://pub.dev"
     source: hosted
-    version: "14.3.1"
+    version: "15.0.0"
+  watcher:
+    dependency: transitive
+    description:
+      name: watcher
+      sha256: "0b7fd4a0bbc4b92641dbf20adfd7e3fd1398fe17102d94b674234563e110088a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   web:
     dependency: transitive
     description:

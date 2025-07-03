@@ -21,311 +21,278 @@ class SignupView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: BlocListener<SignupViewModel, SignupState>(
-          listener: (context, state) {
-            if (state.emailFormStatus == EmailFormStatus.failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.red,
-                  content: Text(
-                    style: TextStyle(color: Colors.white),
-                    state.message != null
-                        ? state.message!
-                        : "Registration Failed",
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                SizedBox(
+                  height: screenHeight * 0.25,
+                  width: double.infinity,
+                  child: Image.asset(
+                    "assets/images/backgroundImage.png",
+                    fit: BoxFit.cover,
                   ),
                 ),
-              );
-              context.read<SignupViewModel>().add(FormReset());
-            } else if (state.emailFormStatus == EmailFormStatus.success) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  behavior: SnackBarBehavior.floating,
-                  backgroundColor: Colors.green,
-                  content: Text(
-                    style: TextStyle(color: Colors.white),
-                    state.message != null
-                        ? state.message!
-                        : "Registration Successfull",
-                  ),
-                ),
-              );
-              context.read<SignupViewModel>().add(FormReset());
-            }
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
-                children: [
-                  SizedBox(
-                    height: screenHeight * 0.25,
-                    width: double.infinity,
+                Positioned(
+                  top: 100,
+                  left: 0,
+                  right: 0,
+                  child: Center(
                     child: Image.asset(
-                      "assets/images/backgroundImage.png",
-                      fit: BoxFit.cover,
+                      "assets/images/appLogo.png",
+                      width: 85,
+                      height: 85,
                     ),
-                  ),
-                  Positioned(
-                    top: 100,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Image.asset(
-                        "assets/images/appLogo.png",
-                        width: 85,
-                        height: 85,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Welcome!",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-
-                      // Full Name
-                      Text(
-                        "Full Name",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        onChanged:
-                            (fullName) => context.read<SignupViewModel>().add(
-                              RegisterFullNameChanged(fullName),
-                            ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your full name";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your Full Name",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Email
-                      Text(
-                        "Email Address",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        onChanged:
-                            (email) => context.read<SignupViewModel>().add(
-                              RegisterEmailChanged(email),
-                            ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter an email address";
-                          }
-                          final emailRegex = RegExp(
-                            r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-                          );
-                          if (!emailRegex.hasMatch(value)) {
-                            return "Please enter a valid email address";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          hintText: "Enter your Email Address",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 16),
-
-                      // Password
-                      Text(
-                        "Password",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      TextFormField(
-                        onChanged:
-                            (password) => context.read<SignupViewModel>().add(
-                              RegisterPasswordChanged(password),
-                            ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter a password";
-                          }
-                          if (value.length < 6) {
-                            return "Password must be at least 6 characters long";
-                          }
-                          return null;
-                        },
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Enter your Password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 26),
-
-                      // Sign Up Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50,
-                        child: BlocBuilder<SignupViewModel, SignupState>(
-                          builder: (context, state) {
-                            return ElevatedButton(
-                              onPressed: () {
-                                context.read<SignupViewModel>().add(
-                                  OnSubmittedEvent(
-                                    state.email,
-                                    state.fullName,
-                                    state.password,
-                                  ),
-                                );
-                              },
-                              child: Text("Sign Up Now"),
-                            );
-                          },
-                        ),
-                      ),
-
-                      SizedBox(height: 26),
-
-                      // Divider
-                      Row(
-                        children: [
-                          const Expanded(
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black87,
-                              endIndent: 12,
-                            ),
-                          ),
-                          const Text(
-                            'or continue with',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const Expanded(
-                            child: Divider(
-                              indent: 12,
-                              color: Colors.black87,
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: 24),
-
-                      // Google Signin
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {},
-                          label: Text(
-                            'Signin with google',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          icon: Image.asset('assets/images/googleLogo.png'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black87,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Colors.grey, width: 1.0),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(24),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      SizedBox(height: 30),
-
-                      // Already have account
-                      Center(
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'Already have an account?',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: ' Signin',
-                                style: TextStyle(
-                                  color: brandColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                recognizer:
-                                    TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder:
-                                                (context) => BlocProvider(
-                                                  create:
-                                                      (context) =>
-                                                          serviceLocator<
-                                                            LoginViewModel
-                                                          >(),
-                                                  child: LoginView(),
-                                                ),
-                                          ),
-                                        );
-                                      },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome!",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                    ),
+                    SizedBox(height: 20),
+        
+                    // Full Name
+                    Text(
+                      "Full Name",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      onChanged:
+                          (fullName) => context.read<SignupViewModel>().add(
+                            RegisterFullNameChanged(fullName),
+                          ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter your full name";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Enter your Full Name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+        
+                    SizedBox(height: 16),
+        
+                    // Email
+                    Text(
+                      "Email Address",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      onChanged:
+                          (email) => context.read<SignupViewModel>().add(
+                            RegisterEmailChanged(email),
+                          ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter an email address";
+                        }
+                        final emailRegex = RegExp(
+                          r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                        );
+                        if (!emailRegex.hasMatch(value)) {
+                          return "Please enter a valid email address";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Enter your Email Address",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+        
+                    SizedBox(height: 16),
+        
+                    // Password
+                    Text(
+                      "Password",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      onChanged:
+                          (password) => context.read<SignupViewModel>().add(
+                            RegisterPasswordChanged(password),
+                          ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Please enter a password";
+                        }
+                        if (value.length < 6) {
+                          return "Password must be at least 6 characters long";
+                        }
+                        return null;
+                      },
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: "Enter your Password",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+        
+                    SizedBox(height: 26),
+        
+                    // Sign Up Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: BlocBuilder<SignupViewModel, SignupState>(
+                        builder: (context, state) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              context.read<SignupViewModel>().add(
+                                OnSubmittedEvent(
+                                  state.email,
+                                  state.fullName,
+                                  state.password,
+                                ),
+                              );
+                            },
+                            child: Text("Sign Up Now"),
+                          );
+                        },
+                      ),
+                    ),
+        
+                    SizedBox(height: 26),
+        
+                    // Divider
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Divider(
+                            thickness: 1,
+                            color: Colors.black87,
+                            endIndent: 12,
+                          ),
+                        ),
+                        const Text(
+                          'or continue with',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        const Expanded(
+                          child: Divider(
+                            indent: 12,
+                            color: Colors.black87,
+                            thickness: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+        
+                    SizedBox(height: 24),
+        
+                    // Google Signin
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {},
+                        label: Text(
+                          'Signin with google',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        icon: Image.asset('assets/images/googleLogo.png'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black87,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.grey, width: 1.0),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(24),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+        
+                    SizedBox(height: 30),
+        
+                    // Already have account
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Already have an account?',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: ' Signin',
+                              style: TextStyle(
+                                color: brandColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer:
+                                  TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder:
+                                              (context) => BlocProvider(
+                                                create:
+                                                    (context) =>
+                                                        serviceLocator<
+                                                          LoginViewModel
+                                                        >(),
+                                                child: LoginView(),
+                                              ),
+                                        ),
+                                      );
+                                    },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

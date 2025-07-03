@@ -27,13 +27,14 @@ class LoginPasswordChanged extends LoginEvent {
 }
 
 class LoginSubmitted extends LoginEvent {
+  final BuildContext context;
   final String email;
   final String password;
 
-  const LoginSubmitted(this.email, this.password);
+  const LoginSubmitted(this.context, this.email, this.password);
 
   @override
-  List<Object?> get props => [email, password];
+  List<Object?> get props => [context, email, password];
 }
 
 class ResetFormStatus extends LoginEvent {}
@@ -45,7 +46,5 @@ class NavigateToSignupEvent extends LoginEvent {
 
 class NavigateToDashboardView extends LoginEvent {
   final BuildContext context;
-  final Widget destination;
-
-  const NavigateToDashboardView({required this.context, required this.destination});
+  const NavigateToDashboardView({required this.context});
 }

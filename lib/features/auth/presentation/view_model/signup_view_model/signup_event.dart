@@ -41,12 +41,14 @@ class OnSubmittedEvent extends SignupEvent {
   final String email;
   final String fullName;
   final String password;
- 
-  const OnSubmittedEvent(this.email, this.fullName, this.password);
- 
+  final BuildContext context;
+
+  const OnSubmittedEvent(this.email, this.fullName, this.password, this.context);
+
   @override
   List<Object?> get props => [email, fullName, password];
 }
+
  
 class FormReset extends SignupEvent {}
  

@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tradeverse/app/service_locator/service_locator.dart';
@@ -76,10 +75,10 @@ class SignupView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          onChanged: (fullName) =>
-                              context.read<SignupViewModel>().add(
-                                    RegisterFullNameChanged(fullName),
-                                  ),
+                          onChanged:
+                              (fullName) => context.read<SignupViewModel>().add(
+                                RegisterFullNameChanged(fullName),
+                              ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Please enter your full name";
@@ -106,10 +105,10 @@ class SignupView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          onChanged: (email) =>
-                              context.read<SignupViewModel>().add(
-                                    RegisterEmailChanged(email),
-                                  ),
+                          onChanged:
+                              (email) => context.read<SignupViewModel>().add(
+                                RegisterEmailChanged(email),
+                              ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Please enter an email address";
@@ -142,10 +141,10 @@ class SignupView extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
-                          onChanged: (password) =>
-                              context.read<SignupViewModel>().add(
-                                    RegisterPasswordChanged(password),
-                                  ),
+                          onChanged:
+                              (password) => context.read<SignupViewModel>().add(
+                                RegisterPasswordChanged(password),
+                              ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Please enter a password";
@@ -174,13 +173,13 @@ class SignupView extends StatelessWidget {
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
                                 context.read<SignupViewModel>().add(
-                                      OnSubmittedEvent(
-                                        state.email,
-                                        state.fullName,
-                                        state.password,
-                                        context, // ✅ BuildContext passed here
-                                      ),
-                                    );
+                                  OnSubmittedEvent(
+                                    state.email,
+                                    state.fullName,
+                                    state.password,
+                                    context, // ✅ BuildContext passed here
+                                  ),
+                                );
                               }
                             },
                             child: const Text("Sign Up Now"),
@@ -239,8 +238,10 @@ class SignupView extends StatelessWidget {
                                 vertical: 14,
                               ),
                               shape: RoundedRectangleBorder(
-                                side:
-                                    const BorderSide(color: Colors.grey, width: 1.0),
+                                side: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                ),
                                 borderRadius: const BorderRadius.all(
                                   Radius.circular(24),
                                 ),
@@ -255,30 +256,40 @@ class SignupView extends StatelessWidget {
                         Center(
                           child: RichText(
                             text: TextSpan(
-                              text: 'Already have an account?',
                               style: const TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
                               ),
                               children: [
-                                TextSpan(
-                                  text: ' Signin',
-                                  style: TextStyle(
-                                    color: brandColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
+                                const TextSpan(
+                                  text: 'Already have an account?',
+                                ),
+                                WidgetSpan(
+                                  child: GestureDetector(
+                                    onTap: () {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => BlocProvider(
-                                            create: (_) => serviceLocator<LoginViewModel>(),
-                                            child: LoginView(),
-                                          ),
+                                          builder:
+                                              (context) => BlocProvider(
+                                                create:
+                                                    (_) =>
+                                                        serviceLocator<
+                                                          LoginViewModel
+                                                        >(),
+                                                child: LoginView(),
+                                              ),
                                         ),
                                       );
                                     },
+                                    child: Text(
+                                      'Signin',
+                                      style: TextStyle(
+                                        color: brandColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

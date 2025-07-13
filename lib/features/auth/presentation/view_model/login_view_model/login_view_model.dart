@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tradeverse/app/service_locator/service_locator.dart';
 import 'package:tradeverse/core/common/snackbar/my_snackbar.dart';
 import 'package:tradeverse/features/auth/domain/use_case/auth_login_use_case.dart';
-import 'package:tradeverse/features/auth/presentation/view/signup_view.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_state.dart';
-import 'package:tradeverse/features/auth/presentation/view_model/signup_view_model/signup_view_model.dart';
-import 'package:tradeverse/view/dashboard.dart';
 
 class LoginViewModel extends Bloc<LoginEvent, LoginState> {
   final AuthLoginUsecase _authLoginUsecase;
-  LoginViewModel(this._authLoginUsecase) : super(LoginState()) {
+  final void Function({
+    required BuildContext context,
+    required String message,
+    Color? color,
+  })
+  _showSnackbar;
+
+  LoginViewModel(
+    this._authLoginUsecase, {
+    void Function({
+      required BuildContext context,
+      required String message,
+      Color? color,
+    })?
+    showSnackbar,
+  }) : _showSnackbar = showSnackbar ?? showMySnackbar,
+       super(const LoginState()) {
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
-    on<ResetFormStatus>(_onResetFormStatus);
-    on<NavigateToSignupEvent>(_onNavigateToSignup);
-    on<NavigateToDashboardView>(_onNavigateToDashboard);
+    // on<ResetFormStatus>(_onResetFormStatus);
   }
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
@@ -58,7 +68,7 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
             message: "Login Failed",
           ),
         ),
-        showSnackbar(
+        _showSnackbar(
           message: 'Login Failed!',
           context: event.context,
           color: Colors.red,
@@ -71,50 +81,52 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
             message: "Login Successfull",
           ),
         );
-        showSnackbar(
+        _showSnackbar(
           message: 'Login Successful!',
           context: event.context,
           color: Colors.green,
         );
         await Future.delayed(Duration(seconds: 1));
         if (event.context.mounted) {
-          add(NavigateToDashboardView(context: event.context));
+          // add(NavigateToDashboardView(context: event.context));
         }
       },
     );
   }
 
-  void _onNavigateToSignup(
-    NavigateToSignupEvent event,
-    Emitter<LoginState> emit,
-  ) {
-    if (event.context.mounted) {
-      Navigator.push(
-        event.context,
-        MaterialPageRoute(
-          builder:
-              (context) => BlocProvider.value(
-                value: serviceLocator<SignupViewModel>(),
-                child: SignupView(),
-              ),
-        ),
-      );
-    }
-  }
+  // void _onNavigateToSignup(
+  //   NavigateToSignupEvent event,
+  //   Emitter<LoginState> emit,
+  // ) {
+  //   if (event.context.mounted) {
+  //     Navigator.push(
+  //       event.context,
+  //       MaterialPageRoute(
+  //         builder:
+  //             (context) => BlocProvider.value(
+  //               value: serviceLocator<SignupViewModel>(),
+  //               child: SignupView(),
+  //             ),
+  //       ),
+  //     );
+  //   }
+  // }
 
-  void _onNavigateToDashboard(
-    NavigateToDashboardView event,
-    Emitter<LoginState> emit,
-  ) {
-    if (event.context.mounted) {
-      Navigator.push(
-        event.context,
-        MaterialPageRoute(builder: (context) => Dashboard()),
-      );
-    }
-  }
+  // void _onNavigateToDashboard(
+  //   NavigateToDashboardView event,
+  //   Emitter<LoginState> emit,
+  // ) {
+  //   if (event.context.mounted) {
+  //     Navigator.push(
+  //       event.context,
+  //       MaterialPageRoute(builder: (context) => Dashboard()),
+  //     );
+  //   }
+  // }
 
-  void _onResetFormStatus(ResetFormStatus event, Emitter<LoginState> emit) {
-    emit(state.copyWith(formStatus: FormStatus.initial, message: null));
-  }
+//   void _onResetFormStatus(ResetFormStatus event, Emitter<LoginState> emit) {
+//     emit(state.copyWith(formStatus: FormStatus.initial, message: null));
+//   }
+// }
+
 }

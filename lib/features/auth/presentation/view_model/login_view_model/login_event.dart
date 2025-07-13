@@ -39,12 +39,12 @@ class LoginSubmitted extends LoginEvent {
 
 class ResetFormStatus extends LoginEvent {}
 
-class NavigateToSignupEvent extends LoginEvent {
-  final BuildContext context;
-  const NavigateToSignupEvent({required this.context});
-}
+// class NavigateToSignupEvent extends LoginEvent {
+//   final BuildContext context;
+//   const NavigateToSignupEvent({required this.context});
+// }
 
-class NavigateToDashboardView extends LoginEvent {
-  final BuildContext context;
-  const NavigateToDashboardView({required this.context});
-}
+// class NavigateToDashboardView extends LoginEvent {
+//   final BuildContext context;
+//   const NavigateToDashboardView({required this.context});
+// }

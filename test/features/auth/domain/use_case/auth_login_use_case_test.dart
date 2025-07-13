@@ -22,44 +22,55 @@ void main() {
   const loginParams = LoginParams(email: testEmail, password: testPassword);
 
   test('should return token string when login is successful', () async {
-    when(() => mockAuthRepository.loginToAccount(testEmail, testPassword))
-        .thenAnswer((_) async => const Right(testToken));
+    when(
+      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
+    ).thenAnswer((_) async => const Right(testToken));
 
     final result = await authLoginUsecase(loginParams);
 
     expect(result, const Right(testToken));
-    verify(() => mockAuthRepository.loginToAccount(testEmail, testPassword)).called(1);
+    verify(
+      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
+    ).called(1);
     verifyNoMoreInteractions(mockAuthRepository);
   });
 
   test('should return failure when login fails', () async {
     final failure = ApiFailure(message: 'Invalid credentials');
-    when(() => mockAuthRepository.loginToAccount(testEmail, testPassword))
-        .thenAnswer((_) async => Left(failure));
+    when(
+      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
+    ).thenAnswer((_) async => Left(failure));
 
     final result = await authLoginUsecase(loginParams);
 
     expect(result, Left(failure));
-    verify(() => mockAuthRepository.loginToAccount(testEmail, testPassword)).called(1);
+    verify(
+      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
+    ).called(1);
     verifyNoMoreInteractions(mockAuthRepository);
   });
 
-  test('should call repository with empty credentials when LoginParams.initial is used', () async {
-    const emptyParams = LoginParams.initial();
-    when(() => mockAuthRepository.loginToAccount('', ''))
-        .thenAnswer((_) async => const Right('empty_token'));
+  test(
+    'should call repository with empty credentials when LoginParams.initial is used',
+    () async {
+      const emptyParams = LoginParams.initial();
+      when(
+        () => mockAuthRepository.loginToAccount('', ''),
+      ).thenAnswer((_) async => const Right('empty_token'));
 
-    final result = await authLoginUsecase(emptyParams);
+      final result = await authLoginUsecase(emptyParams);
 
-    expect(result, const Right('empty_token'));
-    verify(() => mockAuthRepository.loginToAccount('', '')).called(1);
-    verifyNoMoreInteractions(mockAuthRepository);
-  });
+      expect(result, const Right('empty_token'));
+      verify(() => mockAuthRepository.loginToAccount('', '')).called(1);
+      verifyNoMoreInteractions(mockAuthRepository);
+    },
+  );
 
   test('should handle login with whitespace-only credentials', () async {
     const whitespaceParams = LoginParams(email: ' ', password: ' ');
-    when(() => mockAuthRepository.loginToAccount(' ', ' '))
-        .thenAnswer((_) async => const Right('whitespace_token'));
+    when(
+      () => mockAuthRepository.loginToAccount(' ', ' '),
+    ).thenAnswer((_) async => const Right('whitespace_token'));
 
     final result = await authLoginUsecase(whitespaceParams);
 
@@ -84,9 +95,6 @@ void main() {
 
     expect(initial.email, '');
     expect(initial.password, '');
-    expect(
-      initial,
-      const LoginParams(email: '', password: ''),
-    );
+    expect(initial, const LoginParams(email: '', password: ''));
   });
 }

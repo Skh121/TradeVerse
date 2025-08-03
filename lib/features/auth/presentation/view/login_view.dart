@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradeverse/app/secure_storage/secure_storage_service.dart';
 import 'package:tradeverse/app/service_locator/service_locator.dart';
+import 'package:tradeverse/features/auth/presentation/view/request_otp_view.dart';
 import 'package:tradeverse/features/auth/presentation/view/signup_view.dart';
+import 'package:tradeverse/features/auth/presentation/view_model/forgot_password_view_model.dart/forgot_password_view_model.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/signup_view_model/signup_view_model.dart';
-import 'package:tradeverse/view/dashboard.dart';
+import 'package:tradeverse/features/navigation/presentation/view/app_shell.dart';
+import 'package:tradeverse/features/payment/presentation/view/payment_view.dart';
 
 class LoginView extends StatelessWidget {
   LoginView({super.key});
@@ -23,16 +27,25 @@ class LoginView extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       body: BlocListener<LoginViewModel, LoginState>(
-        // listenWhen: (previous,current){
-        //   previous.formStatus == FormStatus.success != current
-        // },
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state.formStatus == FormStatus.success &&
               state.message == "Login Successfull") {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => Dashboard()),
-            );
+            final secureStorage = serviceLocator<SecureStorageService>();
+            final role = await secureStorage.getRole();
+            if (!context.mounted) return;
+            if (role == 'member') {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => AppShell()),
+              );
+            } else {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PaymentView(email: state.email),
+                ),
+              );
+            }
           }
         },
         child: SingleChildScrollView(
@@ -142,7 +155,22 @@ class LoginView extends StatelessWidget {
                         alignment: Alignment.centerRight,
                         child: GestureDetector(
                           onTap: () {
-                            // Forgot password logic
+                            // NEW: Navigate to ForgotPasswordScreen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) =>
+                                        BlocProvider<ForgotPasswordViewModel>(
+                                          create:
+                                              (context) =>
+                                                  serviceLocator<
+                                                    ForgotPasswordViewModel
+                                                  >(),
+                                          child: const RequestOtpView(),
+                                        ),
+                              ),
+                            );
                           },
                           child: const Text(
                             'Forgot Password?',
@@ -173,60 +201,6 @@ class LoginView extends StatelessWidget {
                               child: const Text('Login Now'),
                             );
                           },
-                        ),
-                      ),
-                      const SizedBox(height: 26),
-                      Row(
-                        children: const [
-                          Expanded(
-                            child: Divider(
-                              thickness: 1,
-                              color: Colors.black87,
-                              endIndent: 12,
-                            ),
-                          ),
-                          Text(
-                            'or continue with',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              indent: 12,
-                              color: Colors.black87,
-                              thickness: 1,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Google Sign-in logic
-                          },
-                          label: const Text('Signin with google'),
-                          icon: Image.asset('assets/images/googleLogo.png'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.black87,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                color: Colors.grey,
-                                width: 1.0,
-                              ),
-                              borderRadius: const BorderRadius.all(
-                                Radius.circular(24),
-                              ),
-                            ),
-                          ),
                         ),
                       ),
                       const SizedBox(height: 30),

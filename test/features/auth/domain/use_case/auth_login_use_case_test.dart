@@ -2,99 +2,101 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:tradeverse/core/error/failure.dart';
+import 'package:tradeverse/features/auth/domain/entity/user_entity.dart';
 import 'package:tradeverse/features/auth/domain/repository/auth_repository.dart';
 import 'package:tradeverse/features/auth/domain/use_case/auth_login_use_case.dart';
 
 class MockAuthRepository extends Mock implements IAuthRepository {}
 
 void main() {
-  late AuthLoginUsecase authLoginUsecase;
-  late MockAuthRepository mockAuthRepository;
+  late MockAuthRepository mockRepository;
+  late AuthLoginUsecase usecase;
+
+  const tEmail = 'test@example.com';
+  const tPassword = 'password123';
+  final tParams = LoginParams(email: tEmail, password: tPassword);
+  final tUser = UserEntity(
+    id: '1',
+    fullName: 'Test User',
+    email: tEmail,
+    password: tPassword,
+    token: 'mock_token',
+    role: 'member',
+  );
 
   setUp(() {
-    mockAuthRepository = MockAuthRepository();
-    authLoginUsecase = AuthLoginUsecase(authRepository: mockAuthRepository);
+    mockRepository = MockAuthRepository();
+    usecase = AuthLoginUsecase(authRepository: mockRepository);
   });
 
-  const testEmail = 'test@example.com';
-  const testPassword = 'password123';
-  const testToken = 'mocked_token';
-  const loginParams = LoginParams(email: testEmail, password: testPassword);
-
-  test('should return token string when login is successful', () async {
-    when(
-      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
-    ).thenAnswer((_) async => const Right(testToken));
-
-    final result = await authLoginUsecase(loginParams);
-
-    expect(result, const Right(testToken));
-    verify(
-      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
-    ).called(1);
-    verifyNoMoreInteractions(mockAuthRepository);
+  test('UserEntity props contains all fields', () {
+    expect(tUser.props, [
+      '1',
+      'Test User',
+      tEmail,
+      tPassword,
+      'mock_token',
+      'member',
+    ]);
   });
 
-  test('should return failure when login fails', () async {
-    final failure = ApiFailure(message: 'Invalid credentials');
+  test('LoginParams props contains email and password', () {
+    expect(tParams.props, [tEmail, tPassword]);
+  });
+
+  test('should return UserEntity when login is successful', () async {
     when(
-      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
+      () => mockRepository.loginToAccount(tEmail, tPassword),
+    ).thenAnswer((_) async => Right(tUser));
+
+    final result = await usecase(tParams);
+
+    expect(result, Right(tUser));
+    verify(() => mockRepository.loginToAccount(tEmail, tPassword)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  });
+
+  test('should return Failure when login fails from repository', () async {
+    final failure = ServerFailure(message: 'Invalid credentials');
+    when(
+      () => mockRepository.loginToAccount(tEmail, tPassword),
     ).thenAnswer((_) async => Left(failure));
 
-    final result = await authLoginUsecase(loginParams);
+    final result = await usecase(tParams);
 
     expect(result, Left(failure));
-    verify(
-      () => mockAuthRepository.loginToAccount(testEmail, testPassword),
-    ).called(1);
-    verifyNoMoreInteractions(mockAuthRepository);
+    verify(() => mockRepository.loginToAccount(tEmail, tPassword)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  });
+
+  test('should return ServerFailure when Exception is thrown', () async {
+    when(
+      () => mockRepository.loginToAccount(tEmail, tPassword),
+    ).thenThrow(Exception('Network error'));
+
+    final result = await usecase(tParams);
+
+    expect(result, isA<Left<Failure, UserEntity>>());
+    final failure = (result as Left).value as ServerFailure;
+    expect(failure.message, contains('Network error'));
+    verify(() => mockRepository.loginToAccount(tEmail, tPassword)).called(1);
+    verifyNoMoreInteractions(mockRepository);
   });
 
   test(
-    'should call repository with empty credentials when LoginParams.initial is used',
+    'should return ServerFailure when non-Exception error is thrown',
     () async {
-      const emptyParams = LoginParams.initial();
       when(
-        () => mockAuthRepository.loginToAccount('', ''),
-      ).thenAnswer((_) async => const Right('empty_token'));
+        () => mockRepository.loginToAccount(tEmail, tPassword),
+      ).thenThrow('Unexpected String error');
 
-      final result = await authLoginUsecase(emptyParams);
+      final result = await usecase(tParams);
 
-      expect(result, const Right('empty_token'));
-      verify(() => mockAuthRepository.loginToAccount('', '')).called(1);
-      verifyNoMoreInteractions(mockAuthRepository);
+      expect(result, isA<Left<Failure, UserEntity>>());
+      final failure = (result as Left).value as ServerFailure;
+      expect(failure.message, contains('Unexpected String error'));
+      verify(() => mockRepository.loginToAccount(tEmail, tPassword)).called(1);
+      verifyNoMoreInteractions(mockRepository);
     },
   );
-
-  test('should handle login with whitespace-only credentials', () async {
-    const whitespaceParams = LoginParams(email: ' ', password: ' ');
-    when(
-      () => mockAuthRepository.loginToAccount(' ', ' '),
-    ).thenAnswer((_) async => const Right('whitespace_token'));
-
-    final result = await authLoginUsecase(whitespaceParams);
-
-    expect(result, const Right('whitespace_token'));
-    verify(() => mockAuthRepository.loginToAccount(' ', ' ')).called(1);
-    verifyNoMoreInteractions(mockAuthRepository);
-  });
-
-  test('LoginParams equality should match props correctly', () {
-    const p1 = LoginParams(email: 'a@b.com', password: '123');
-    const p2 = LoginParams(email: 'a@b.com', password: '123');
-    const p3 = LoginParams(email: 'x@b.com', password: '123');
-    const p4 = LoginParams(email: 'a@b.com', password: 'x');
-
-    expect(p1, p2);
-    expect(p1 == p3, false);
-    expect(p1 == p4, false);
-  });
-
-  test('LoginParams.initial constructor sets empty values', () {
-    const initial = LoginParams.initial();
-
-    expect(initial.email, '');
-    expect(initial.password, '');
-    expect(initial, const LoginParams(email: '', password: ''));
-  });
 }

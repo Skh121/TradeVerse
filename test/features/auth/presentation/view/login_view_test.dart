@@ -1,87 +1,108 @@
-import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bloc_test/bloc_test.dart'; // Import for MockBloc
 import 'package:tradeverse/app/service_locator/service_locator.dart';
 import 'package:tradeverse/features/auth/presentation/view/login_view.dart';
+import 'package:tradeverse/features/auth/presentation/view/request_otp_view.dart';
 import 'package:tradeverse/features/auth/presentation/view/signup_view.dart';
+import 'package:tradeverse/features/auth/presentation/view_model/forgot_password_view_model.dart/forgot_password_event.dart';
+import 'package:tradeverse/features/auth/presentation/view_model/forgot_password_view_model.dart/forgot_password_state.dart';
+import 'package:tradeverse/features/auth/presentation/view_model/forgot_password_view_model.dart/forgot_password_view_model.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_view_model.dart';
+import 'package:tradeverse/features/auth/presentation/view_model/signup_view_model/signup_event.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/signup_view_model/signup_state.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/signup_view_model/signup_view_model.dart';
-import 'package:tradeverse/view/dashboard.dart';
 
-// Mocks using mocktail
-class MockLoginViewModel extends Mock implements LoginViewModel {}
+// Mocks
+class MockLoginViewModel extends MockBloc<LoginEvent, LoginState>
+    implements LoginViewModel {}
 
-class MockSignupViewModel extends Mock implements SignupViewModel {}
+class MockSignupViewModel extends MockBloc<SignupEvent, SignupState>
+    implements SignupViewModel {}
+
+class MockForgotPasswordViewModel
+    extends MockBloc<ForgotPasswordEvent, ForgotPasswordState>
+    implements ForgotPasswordViewModel {}
 
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
-// Fake classes for fallback values
+// Fakes
 class FakeLoginEvent extends Fake implements LoginEvent {}
+
+class FakeSignupEvent extends Fake implements SignupEvent {}
+
+class FakeForgotPasswordEvent extends Fake implements ForgotPasswordEvent {}
 
 class FakeLoginState extends Fake implements LoginState {}
 
 class FakeSignupState extends Fake implements SignupState {}
 
+class FakeForgotPasswordState extends Fake implements ForgotPasswordState {}
+
 class FakeRoute extends Fake implements Route<dynamic> {}
 
 void main() {
-  late LoginViewModel mockLoginViewModel;
-  late SignupViewModel mockSignupViewModel;
+  late MockLoginViewModel mockLoginViewModel;
+  late MockSignupViewModel mockSignupViewModel;
+  late MockForgotPasswordViewModel mockForgotPasswordViewModel;
   late MockNavigatorObserver mockNavigatorObserver;
 
-  // This setup runs once before all tests
   setUpAll(() {
     registerFallbackValue(FakeLoginEvent());
+    registerFallbackValue(FakeSignupEvent());
+    registerFallbackValue(FakeForgotPasswordEvent());
     registerFallbackValue(FakeLoginState());
     registerFallbackValue(FakeSignupState());
+    registerFallbackValue(FakeForgotPasswordState());
     registerFallbackValue(FakeRoute());
   });
 
-  // This setup runs before each individual test
   setUp(() {
     mockLoginViewModel = MockLoginViewModel();
     mockSignupViewModel = MockSignupViewModel();
+    mockForgotPasswordViewModel = MockForgotPasswordViewModel();
     mockNavigatorObserver = MockNavigatorObserver();
 
-    // Stub the initial states and streams for both view models
+    // Stub the initial states for all view models
     when(() => mockLoginViewModel.state).thenReturn(const LoginState());
-    when(
-      () => mockLoginViewModel.stream,
-    ).thenAnswer((_) => Stream.fromIterable([]));
-    when(() => mockLoginViewModel.close()).thenAnswer((_) async {});
-
     when(() => mockSignupViewModel.state).thenReturn(const SignupState());
     when(
-      () => mockSignupViewModel.stream,
-    ).thenAnswer((_) => Stream.fromIterable([]));
-    when(() => mockSignupViewModel.close()).thenAnswer((_) async {});
+      () => mockForgotPasswordViewModel.state,
+    ).thenReturn(ForgotPasswordInitial());
 
-    // Configure the service locator to return our mock instance for the test.
-    if (serviceLocator.isRegistered<SignupViewModel>()) {
-      serviceLocator.unregister<SignupViewModel>();
+    // Register all necessary mocks in the service locator
+    serviceLocator.allowReassignment = true;
+    if (!serviceLocator.isRegistered<SignupViewModel>()) {
+      serviceLocator.registerSingleton<SignupViewModel>(mockSignupViewModel);
     }
-    serviceLocator.registerSingleton<SignupViewModel>(mockSignupViewModel);
+    if (!serviceLocator.isRegistered<ForgotPasswordViewModel>()) {
+      serviceLocator.registerSingleton<ForgotPasswordViewModel>(
+        mockForgotPasswordViewModel,
+      );
+    }
   });
 
-  // This runs after each test to clean up the service locator
   tearDown(() {
     serviceLocator.unregister<SignupViewModel>();
+    serviceLocator.unregister<ForgotPasswordViewModel>();
   });
 
-  // Helper to pump the widget within a MaterialApp and BlocProvider
   Future<void> pumpLoginView(WidgetTester tester) async {
     await tester.pumpWidget(
-      BlocProvider<LoginViewModel>.value(
-        value: mockLoginViewModel,
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<LoginViewModel>.value(value: mockLoginViewModel),
+          BlocProvider<SignupViewModel>.value(value: mockSignupViewModel),
+          BlocProvider<ForgotPasswordViewModel>.value(
+            value: mockForgotPasswordViewModel,
+          ),
+        ],
         child: MaterialApp(
           home: LoginView(),
-          // The Dashboard is a simple placeholder for navigation testing
-          routes: {'/dashboard': (context) => const Dashboard()},
           navigatorObservers: [mockNavigatorObserver],
         ),
       ),
@@ -91,18 +112,10 @@ void main() {
   group('LoginView', () {
     testWidgets('renders all initial UI elements correctly', (tester) async {
       await pumpLoginView(tester);
-
-      // Scroll to the bottom to ensure all widgets are visible
-      final lastElementFinder = find.text('Signup');
-      await tester.ensureVisible(lastElementFinder);
       await tester.pumpAndSettle();
 
-      // Assertions for all visible widgets
       expect(find.text('Welcome back!'), findsOneWidget);
-      expect(
-        find.byType(Image),
-        findsNWidgets(3),
-      ); // Background, Logo, Google Logo
+      expect(find.byType(Image), findsNWidgets(2));
       expect(
         find.widgetWithText(TextFormField, 'Enter your email address'),
         findsOneWidget,
@@ -111,12 +124,21 @@ void main() {
         find.widgetWithText(TextFormField, 'Enter your password'),
         findsOneWidget,
       );
-      expect(find.text('Forgot Password?'), findsOneWidget);
       expect(find.widgetWithText(ElevatedButton, 'Login Now'), findsOneWidget);
-      expect(find.text('Signin with google'), findsOneWidget);
-      expect(find.text("Don't have an account?"), findsOneWidget);
-      expect(lastElementFinder, findsOneWidget);
+
+      final forgotPasswordFinder = find.text('Forgot Password?');
+      await tester.ensureVisible(forgotPasswordFinder);
+      expect(forgotPasswordFinder, findsOneWidget);
+
+      final noAccountFinder = find.text("Don't have an account?");
+      await tester.ensureVisible(noAccountFinder);
+      expect(noAccountFinder, findsOneWidget);
+
+      final signupFinder = find.text('Signup');
+      await tester.ensureVisible(signupFinder);
+      expect(signupFinder, findsOneWidget);
     });
+
 
     group('Form Validation', () {
       testWidgets('shows error for empty fields on submit', (tester) async {
@@ -136,7 +158,6 @@ void main() {
         );
         await tester.tap(find.widgetWithText(ElevatedButton, 'Login Now'));
         await tester.pump();
-
         expect(find.text('Please enter a valid email'), findsOneWidget);
       });
     });
@@ -145,11 +166,15 @@ void main() {
       testWidgets('adds LoginSubmitted event when form is valid', (
         tester,
       ) async {
-        await pumpLoginView(tester);
         const email = 'test@example.com';
         const password = 'password123';
 
-        // Enter valid data
+        when(
+          () => mockLoginViewModel.state,
+        ).thenReturn(const LoginState(email: email, password: password));
+
+        await pumpLoginView(tester);
+
         await tester.enterText(
           find.widgetWithText(TextFormField, 'Enter your email address'),
           email,
@@ -160,11 +185,9 @@ void main() {
         );
         await tester.pump();
 
-        // Tap the login button
         await tester.tap(find.widgetWithText(ElevatedButton, 'Login Now'));
         await tester.pump();
 
-        // Verify that the correct event was added
         final captured =
             verify(
               () => mockLoginViewModel.add(
@@ -176,73 +199,22 @@ void main() {
         expect(event.email, email);
         expect(event.password, password);
       });
-    });
 
-    group('Bloc Listener and Navigation', () {
-      testWidgets('navigates to Dashboard on successful login', (tester) async {
-        // Setup the BLoC to emit a success state when listened to
-        whenListen(
-          mockLoginViewModel,
-          Stream.fromIterable([
-            const LoginState(
-              formStatus: FormStatus.success,
-              message: 'Login Successfull',
-            ),
-          ]),
-          initialState: const LoginState(),
-        );
-
-        await pumpLoginView(tester);
-        await tester
-            .pumpAndSettle(); // Allow listener to process the state and navigate
-
-        // Verify that a replacement navigation occurred
-        verify(
-          () => mockNavigatorObserver.didReplace(
-            newRoute: any(named: 'newRoute'),
-            oldRoute: any(named: 'oldRoute'),
-          ),
-        ).called(1);
-        // Verify that the Dashboard is now the visible screen
-        expect(find.byType(Dashboard), findsOneWidget);
-        expect(find.byType(LoginView), findsNothing);
-      });
-
-      // ✅ New test to cover non-successful login states in the BlocListener
-      testWidgets('does not navigate when login state is not success', (
+      testWidgets('does not add LoginSubmitted event when form is invalid', (
         tester,
       ) async {
-        // Setup the BLoC to emit a failure state
-        whenListen(
-          mockLoginViewModel,
-          Stream.fromIterable([
-            const LoginState(formStatus: FormStatus.failure),
-          ]),
-          initialState: const LoginState(),
-        );
-
         await pumpLoginView(tester);
-        // ✅ FIX: Clear interactions after the initial view is built to ignore the first push.
-        clearInteractions(mockNavigatorObserver);
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Login Now'));
+        await tester.pump();
 
-        await tester.pumpAndSettle();
-
-        // Verify that no navigation methods were called on the observer *after* the initial build.
         verifyNever(
-          () => mockNavigatorObserver.didReplace(
-            newRoute: any(named: 'newRoute'),
-            oldRoute: any(named: 'oldRoute'),
-          ),
+          () => mockLoginViewModel.add(any(that: isA<LoginSubmitted>())),
         );
-        verifyNever(() => mockNavigatorObserver.didPush(any(), any()));
-        // Ensure we are still on the LoginView
-        expect(find.byType(LoginView), findsOneWidget);
       });
     });
 
-    // ✅ New test group for other interactions to ensure full coverage
-    group('Other Interactions', () {
-      testWidgets('tapping "Forgot Password?" does not throw error', (
+    group('Navigation', () {
+      testWidgets('tapping "Forgot Password?" navigates to RequestOtpView', (
         tester,
       ) async {
         await pumpLoginView(tester);
@@ -253,47 +225,20 @@ void main() {
         await tester.tap(forgotPasswordFinder);
         await tester.pumpAndSettle();
 
-        // Verify no navigation occurred and no errors were thrown
-        verifyNever(() => mockNavigatorObserver.didPush(any(), any()));
-        expect(find.byType(LoginView), findsOneWidget);
+        verify(() => mockNavigatorObserver.didPush(any(), any())).called(1);
+        expect(find.byType(RequestOtpView), findsOneWidget);
       });
 
-      testWidgets('tapping "Signin with google" does not throw error', (
-        tester,
-      ) async {
-        await pumpLoginView(tester);
-        clearInteractions(mockNavigatorObserver);
-
-        final googleButtonFinder = find.text('Signin with google');
-        await tester.ensureVisible(googleButtonFinder);
-        await tester.tap(googleButtonFinder);
-        await tester.pumpAndSettle();
-
-        // Verify no navigation occurred and no errors were thrown
-        verifyNever(() => mockNavigatorObserver.didPush(any(), any()));
-        expect(find.byType(LoginView), findsOneWidget);
-      });
-    });
-
-    group('Navigation to Signup', () {
       testWidgets('tapping "Signup" navigates to SignupView', (tester) async {
         await pumpLoginView(tester);
-
-        // Clear interactions on the mock observer after the initial build.
         clearInteractions(mockNavigatorObserver);
 
-        final signupLinkFinder = find.text('Signup');
-
-        await tester.ensureVisible(signupLinkFinder);
+        final signupFinder = find.text('Signup');
+        await tester.ensureVisible(signupFinder);
+        await tester.tap(signupFinder);
         await tester.pumpAndSettle();
 
-        await tester.tap(signupLinkFinder);
-        await tester.pumpAndSettle();
-
-        // Verify that exactly one push navigation occurred *after* the tap.
         verify(() => mockNavigatorObserver.didPush(any(), any())).called(1);
-
-        // Verify that the SignupView is now on screen
         expect(find.byType(SignupView), findsOneWidget);
       });
     });

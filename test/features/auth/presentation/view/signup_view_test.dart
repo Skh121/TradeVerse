@@ -97,7 +97,7 @@ void main() {
       expect(find.text('Welcome!'), findsOneWidget);
       expect(
         find.byType(Image),
-        findsNWidgets(3),
+        findsNWidgets(2),
       ); // Background, Logo, Google Logo
       expect(
         find.widgetWithText(TextFormField, 'Enter your Full Name'),
@@ -115,7 +115,6 @@ void main() {
         find.widgetWithText(ElevatedButton, 'Sign Up Now'),
         findsOneWidget,
       );
-      expect(find.text('Signin with google'), findsOneWidget);
 
       // ✅ FIX: Use a more robust predicate that inspects the TextSpan children directly.
       expect(
@@ -272,23 +271,6 @@ void main() {
         verifyNever(
           () => mockSignupViewModel.add(any(that: isA<OnSubmittedEvent>())),
         );
-      });
-    });
-
-    group('Other Interactions', () {
-      testWidgets('tapping "Signin with google" does not throw error', (
-        tester,
-      ) async {
-        await pumpSignupView(tester);
-        clearInteractions(mockNavigatorObserver);
-
-        final googleButtonFinder = find.text('Signin with google');
-        await tester.ensureVisible(googleButtonFinder);
-        await tester.tap(googleButtonFinder);
-        await tester.pumpAndSettle();
-
-        verifyNever(() => mockNavigatorObserver.didPush(any(), any()));
-        expect(find.byType(SignupView), findsOneWidget);
       });
     });
 

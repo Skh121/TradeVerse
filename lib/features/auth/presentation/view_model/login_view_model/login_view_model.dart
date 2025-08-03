@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tradeverse/app/secure_storage/secure_storage_service.dart';
 import 'package:tradeverse/core/common/snackbar/my_snackbar.dart';
 import 'package:tradeverse/features/auth/domain/use_case/auth_login_use_case.dart';
 import 'package:tradeverse/features/auth/presentation/view_model/login_view_model/login_event.dart';
@@ -27,7 +28,6 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
     on<LoginEmailChanged>(_onEmailChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginSubmitted>(_onLoginSubmitted);
-    // on<ResetFormStatus>(_onResetFormStatus);
   }
 
   void _onEmailChanged(LoginEmailChanged event, Emitter<LoginState> emit) {
@@ -60,73 +60,53 @@ class LoginViewModel extends Bloc<LoginEvent, LoginState> {
       LoginParams(email: email, password: password),
     );
 
-    result.fold(
-      (left) => {
+    await result.fold(
+      (left) async {
         emit(
           state.copyWith(
             formStatus: FormStatus.failure,
             message: "Login Failed",
+            user: null,
           ),
-        ),
-        _showSnackbar(
-          message: 'Login Failed!',
-          context: event.context,
-          color: Colors.red,
-        ),
+        );
+
+        if (event.context.mounted) {
+          _showSnackbar(
+            message: 'Login Failed!',
+            context: event.context,
+            color: Colors.red,
+          );
+        }
       },
-      (right) async {
+      (userEntity) async {
+        final storage = SecureStorageService();
+        await storage.saveUserData(
+          token: userEntity.token ?? "",
+          role: userEntity.role ?? "user",
+          id: userEntity.id ?? "",
+          fullName: userEntity.fullName,
+          email: userEntity.email,
+        );
+
         emit(
           state.copyWith(
             formStatus: FormStatus.success,
             message: "Login Successfull",
+            email: email,
+            user: userEntity,
           ),
         );
-        _showSnackbar(
-          message: 'Login Successful!',
-          context: event.context,
-          color: Colors.green,
-        );
-        await Future.delayed(Duration(seconds: 1));
+
         if (event.context.mounted) {
-          // add(NavigateToDashboardView(context: event.context));
+          _showSnackbar(
+            message: 'Login Successfull!',
+            context: event.context,
+            color: Colors.green,
+          );
         }
+
+        await Future.delayed(const Duration(seconds: 1));
       },
     );
   }
-
-  // void _onNavigateToSignup(
-  //   NavigateToSignupEvent event,
-  //   Emitter<LoginState> emit,
-  // ) {
-  //   if (event.context.mounted) {
-  //     Navigator.push(
-  //       event.context,
-  //       MaterialPageRoute(
-  //         builder:
-  //             (context) => BlocProvider.value(
-  //               value: serviceLocator<SignupViewModel>(),
-  //               child: SignupView(),
-  //             ),
-  //       ),
-  //     );
-  //   }
-  // }
-
-  // void _onNavigateToDashboard(
-  //   NavigateToDashboardView event,
-  //   Emitter<LoginState> emit,
-  // ) {
-  //   if (event.context.mounted) {
-  //     Navigator.push(
-  //       event.context,
-  //       MaterialPageRoute(builder: (context) => Dashboard()),
-  //     );
-  //   }
-  // }
-
-//   void _onResetFormStatus(ResetFormStatus event, Emitter<LoginState> emit) {
-//     emit(state.copyWith(formStatus: FormStatus.initial, message: null));
-//   }
-// }
-
 }
